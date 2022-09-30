@@ -1,0 +1,7 @@
+# typescript
+/node_modules
+/build
+
+# misc
+.DS_Store
+.idea
