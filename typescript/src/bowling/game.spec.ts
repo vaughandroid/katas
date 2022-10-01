@@ -14,7 +14,7 @@ describe('Bowling', () => {
     });
 
     it('The current frame is 0', () => {
-      expect(game.currentFrame).to.equal(0);
+      expect(game.currentFrameIndex).to.equal(0);
     });
 
     it('The scores for each frame are all 0', () => {
@@ -70,39 +70,39 @@ describe('Bowling', () => {
   describe('Frames', () => {
     it('If there is not a strike, a frame consists of two rolls', () => {
       game.roll(1);
-      expect(game.currentFrame).to.equal(0);
+      expect(game.currentFrameIndex).to.equal(0);
 
       game.roll(2);
-      expect(game.currentFrame).to.equal(1);
+      expect(game.currentFrameIndex).to.equal(1);
 
       game.roll(3);
-      expect(game.currentFrame).to.equal(1);
+      expect(game.currentFrameIndex).to.equal(1);
 
       game.roll(4);
-      expect(game.currentFrame).to.equal(2);
+      expect(game.currentFrameIndex).to.equal(2);
 
       game.roll(5);
-      expect(game.currentFrame).to.equal(2);
+      expect(game.currentFrameIndex).to.equal(2);
     });
 
     it('Misses still advance the frame', () => {
       game.roll(0);
       game.roll(0);
-      expect(game.currentFrame).to.equal(1);
+      expect(game.currentFrameIndex).to.equal(1);
 
       game.roll(0);
       game.roll(1);
-      expect(game.currentFrame).to.equal(2);
+      expect(game.currentFrameIndex).to.equal(2);
 
       game.roll(1);
       game.roll(0);
-      expect(game.currentFrame).to.equal(3);
+      expect(game.currentFrameIndex).to.equal(3);
     });
 
     it('Prior to the last frame, rolling a strike ends the frame', () => {
       for (let i = 0; i < 9; i++) {
         game.roll(10);
-        expect(game.currentFrame).to.equal(i + 1);
+        expect(game.currentFrameIndex).to.equal(i + 1);
       }
     });
 
@@ -110,7 +110,7 @@ describe('Bowling', () => {
       for (let i = 0; i < 10 * 2; i++) {
         game.roll(1);
       }
-      expect(game.currentFrame).to.equal(9);
+      expect(game.currentFrameIndex).to.equal(9);
     });
   });
 
@@ -119,8 +119,6 @@ describe('Bowling', () => {
       it('After a spare, the next roll counts towards the score for the frame as a bonus', () => {
         game.roll(0);
         game.roll(10);
-        expect(game.frameScores[0]).to.equal(10);
-        expect(game.score).to.equal(10);
 
         game.roll(1);
         expect(game.frameScores[0]).to.equal(11);
@@ -137,8 +135,6 @@ describe('Bowling', () => {
     describe('Strikes', () => {
       it('After a strike, the next two rolls count towards the score for the frame as a bonus', () => {
         game.roll(10);
-        expect(game.frameScores[0]).to.equal(10);
-        expect(game.score).to.equal(10);
 
         game.roll(1);
         expect(game.frameScores[0]).to.equal(11);
@@ -155,6 +151,52 @@ describe('Bowling', () => {
         expect(game.frameScores[1]).to.equal(2);
         expect(game.frameScores[2]).to.equal(1);
         expect(game.score).to.equal(15);
+      });
+
+      it('Bonuses accumulate correctly after a double strike', () => {
+        game.roll(10);
+
+        game.roll(10);
+        expect(game.frameScores[0]).to.equal(20);
+        expect(game.frameScores[1]).to.equal(10);
+        expect(game.score).to.equal(30);
+
+        game.roll(1);
+        expect(game.frameScores[0]).to.equal(21);
+        expect(game.frameScores[1]).to.equal(11);
+        expect(game.frameScores[2]).to.equal(1);
+        expect(game.score).to.equal(33);
+
+        game.roll(1);
+        expect(game.frameScores[0]).to.equal(21);
+        expect(game.frameScores[1]).to.equal(12);
+        expect(game.frameScores[2]).to.equal(2);
+        expect(game.score).to.equal(35);
+      });
+
+      it('Bonuses accumulate correctly after a triple strike', () => {
+        game.roll(10);
+        game.roll(10);
+
+        game.roll(10);
+        expect(game.frameScores[0]).to.equal(30);
+        expect(game.frameScores[1]).to.equal(20);
+        expect(game.frameScores[2]).to.equal(10);
+        expect(game.score).to.equal(60);
+
+        game.roll(1);
+        expect(game.frameScores[0]).to.equal(30);
+        expect(game.frameScores[1]).to.equal(21);
+        expect(game.frameScores[2]).to.equal(11);
+        expect(game.frameScores[3]).to.equal(1);
+        expect(game.score).to.equal(63);
+
+        game.roll(1);
+        expect(game.frameScores[0]).to.equal(30);
+        expect(game.frameScores[1]).to.equal(21);
+        expect(game.frameScores[2]).to.equal(12);
+        expect(game.frameScores[3]).to.equal(2);
+        expect(game.score).to.equal(65);
       });
     });
   });
