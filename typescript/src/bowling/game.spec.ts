@@ -42,4 +42,25 @@ describe('Bowling', () => {
     expect(game.score()).to.equal(20);
   });
 
+  it('If there are no strikes, a frame consists of two rolls', () => {
+    const game = new Game();
+
+    expect(game.frame()).to.equal(0);
+
+    game.roll(1);
+    expect(game.frame()).to.equal(0);
+
+    game.roll(2);
+    expect(game.frame()).to.equal(1);
+
+    game.roll(3);
+    expect(game.frame()).to.equal(1);
+
+    game.roll(4);
+    expect(game.frame()).to.equal(2);
+
+    game.roll(5);
+    expect(game.frame()).to.equal(2);
+  });
+
 });
