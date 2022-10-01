@@ -10,25 +10,10 @@ export class Game {
       return;
     }
 
-    this.currentFrame.score += pinsKnockedDown;
+    this._frames.forEach(frame => frame.applyBonus(pinsKnockedDown));
 
-    this._frames.forEach(frame => {
-      if (frame.pendingBonusRolls > 0) {
-        frame.score += pinsKnockedDown;
-        frame.pendingBonusRolls--;
-      }
-    })
-
-    this.currentFrame.rollsThisFrame++;
-
-    if (this.currentFrame.score === 10) {
-      if (this.currentFrame.rollsThisFrame === 1) {
-        this.currentFrame.pendingBonusRolls = 2;
-      } else {
-        this.currentFrame.pendingBonusRolls = 1;
-      }
-      this.advanceFrame();
-    } else if (this.currentFrame.rollsThisFrame === 2) {
+    this.currentFrame.applyRoll(pinsKnockedDown);
+    if (this.currentFrame.isCompleted) {
       this.advanceFrame();
     }
   }
@@ -50,7 +35,7 @@ export class Game {
   }
 
   private get gameIsEnded() {
-    return this._currentFrameIndex === 9 && this.currentFrame.rollsThisFrame === 2;
+    return this._currentFrameIndex === 9 && this.currentFrame.isCompleted;
   }
 
   private advanceFrame() {
@@ -64,4 +49,29 @@ class Frame {
   rollsThisFrame = 0;
   score = 0;
   pendingBonusRolls = 0;
+  isCompleted = false;
+
+  applyRoll(pinsKnockedDown: number) {
+    this.score += pinsKnockedDown;
+
+    this.rollsThisFrame++;
+
+    if (this.score === 10) {
+      if (this.rollsThisFrame === 1) {
+        this.pendingBonusRolls = 2;
+      } else {
+        this.pendingBonusRolls = 1;
+      }
+      this.isCompleted = true;
+    } else if (this.rollsThisFrame === 2) {
+      this.isCompleted = true;
+    }
+  }
+
+  applyBonus(pinsKnockedDown: number) {
+    if (this.pendingBonusRolls > 0) {
+      this.score += pinsKnockedDown;
+      this.pendingBonusRolls--;
+    }
+  }
 }
