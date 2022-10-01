@@ -23,6 +23,15 @@ Write a class Game that has two methods
     void roll(int) is called each time the player rolls a ball. The argument is the number of pins knocked down.
     int score() returns the total score for that game.
 
+#### Writeup
+
+Took longer than expected (~2.5hrs) but the final frame was interesting, so I thought finishing was worthwhile completing.
+
+The crux point was definitely the handling of bonuses. Introducing a separate class for the frames was definitely useful.
+
+Ended up adding some extra public methods and properties which weren't described in the spec, but made writing tests much easier.
+I think this was a valid thing to do, since they felt like things that would be useful to clients rather than just internal details.
+
 
 ## Developing
 
