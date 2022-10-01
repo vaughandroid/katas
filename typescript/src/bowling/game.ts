@@ -2,11 +2,11 @@ export class Game {
   private _currentFrameIndex = 0;
   private _frames = [
     new Frame(), new Frame(), new Frame(), new Frame(), new Frame(),
-    new Frame(), new Frame(), new Frame(), new Frame(), new Frame()
+    new Frame(), new Frame(), new Frame(), new Frame(), new FinalFrame()
   ]
 
   roll(pinsKnockedDown: number) {
-    if (this.gameIsEnded) {
+    if (this.hasEnded) {
       return;
     }
 
@@ -30,16 +30,16 @@ export class Game {
     return this._frames.map(frame => frame.score);
   }
 
+  get hasEnded() {
+    return this._currentFrameIndex === 9 && this.currentFrame.isCompleted;
+  }
+
   private get currentFrame() {
     return this._frames[this._currentFrameIndex];
   }
 
-  private get gameIsEnded() {
-    return this._currentFrameIndex === 9 && this.currentFrame.isCompleted;
-  }
-
   private advanceFrame() {
-    if (!this.gameIsEnded) {
+    if (!this.hasEnded) {
       this._currentFrameIndex++;
     }
   }
@@ -49,7 +49,6 @@ class Frame {
   rollsThisFrame = 0;
   score = 0;
   pendingBonusRolls = 0;
-  isCompleted = false;
 
   roll(pinsKnockedDown: number) {
     this.score += pinsKnockedDown;
@@ -57,10 +56,11 @@ class Frame {
 
     if (this.score === 10) {
       this.pendingBonusRolls = this.rollsThisFrame === 1 ? 2 : 1;
-      this.isCompleted = true;
-    } else if (this.rollsThisFrame === 2) {
-      this.isCompleted = true;
     }
+  }
+
+  get isCompleted() {
+    return this.score >= 10 || this.rollsThisFrame === 2;
   }
 
   addBonusIfNeeded(pinsKnockedDown: number) {
@@ -68,5 +68,17 @@ class Frame {
       this.score += pinsKnockedDown;
       this.pendingBonusRolls--;
     }
+  }
+}
+
+class FinalFrame extends Frame {
+  roll(pinsKnockedDown: number) {
+    if (!super.isCompleted) {
+      super.roll(pinsKnockedDown);
+    }
+  }
+
+  get isCompleted() {
+    return super.isCompleted && this.pendingBonusRolls === 0;
   }
 }

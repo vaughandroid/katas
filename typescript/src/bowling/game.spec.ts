@@ -23,14 +23,16 @@ describe('Bowling', () => {
   });
 
   describe('Once the game has ended', () => {
-    it('Further rolls are not counted', () => {
+    it('Further rolls are not counted and the frame index does not advance past 9', () => {
       for (let i = 0; i < 20; i++) {
         game.roll(1);
       }
       expect(game.score).to.equal(20);
+      expect(game.currentFrameIndex).to.equal(9);
 
       game.roll(1);
       expect(game.score).to.equal(20);
+      expect(game.currentFrameIndex).to.equal(9);
     });
   });
 
@@ -107,7 +109,8 @@ describe('Bowling', () => {
     });
 
     it('There are 10 frames', () => {
-      for (let i = 0; i < 10 * 2; i++) {
+      for (let i = 0; i < 10; i++) {
+        game.roll(1);
         game.roll(1);
       }
       expect(game.currentFrameIndex).to.equal(9);
@@ -130,74 +133,130 @@ describe('Bowling', () => {
         expect(game.frameScores[1]).to.equal(2);
         expect(game.score).to.equal(13);
       });
+
+
+      describe('Strikes', () => {
+        it('After a strike, the next two rolls count towards the score for the frame as a bonus', () => {
+          game.roll(10);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(11);
+          expect(game.frameScores[1]).to.equal(1);
+          expect(game.score).to.equal(12);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(12);
+          expect(game.frameScores[1]).to.equal(2);
+          expect(game.score).to.equal(14);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(12);
+          expect(game.frameScores[1]).to.equal(2);
+          expect(game.frameScores[2]).to.equal(1);
+          expect(game.score).to.equal(15);
+        });
+
+        it('Bonuses accumulate correctly after a double strike', () => {
+          game.roll(10);
+
+          game.roll(10);
+          expect(game.frameScores[0]).to.equal(20);
+          expect(game.frameScores[1]).to.equal(10);
+          expect(game.score).to.equal(30);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(21);
+          expect(game.frameScores[1]).to.equal(11);
+          expect(game.frameScores[2]).to.equal(1);
+          expect(game.score).to.equal(33);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(21);
+          expect(game.frameScores[1]).to.equal(12);
+          expect(game.frameScores[2]).to.equal(2);
+          expect(game.score).to.equal(35);
+        });
+
+        it('Bonuses accumulate correctly after a triple strike', () => {
+          game.roll(10);
+          game.roll(10);
+
+          game.roll(10);
+          expect(game.frameScores[0]).to.equal(30);
+          expect(game.frameScores[1]).to.equal(20);
+          expect(game.frameScores[2]).to.equal(10);
+          expect(game.score).to.equal(60);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(30);
+          expect(game.frameScores[1]).to.equal(21);
+          expect(game.frameScores[2]).to.equal(11);
+          expect(game.frameScores[3]).to.equal(1);
+          expect(game.score).to.equal(63);
+
+          game.roll(1);
+          expect(game.frameScores[0]).to.equal(30);
+          expect(game.frameScores[1]).to.equal(21);
+          expect(game.frameScores[2]).to.equal(12);
+          expect(game.frameScores[3]).to.equal(2);
+          expect(game.score).to.equal(65);
+        });
+      });
+    });
+  });
+
+  describe('Final frame', () => {
+    it('If there is no strike or spare, the game ends after 2 rolls', () => {
+      for (let i = 0; i < 9; i++) {
+        game.roll(1);
+        game.roll(1);
+      }
+
+      game.roll(1);
+      game.roll(1);
+
+      expect(game.hasEnded).to.be.true;
+      expect(game.score).to.equal(20);
     });
 
-    describe('Strikes', () => {
-      it('After a strike, the next two rolls count towards the score for the frame as a bonus', () => {
-        game.roll(10);
-
+    it('A spare results in 1 extra bonus roll, which is only counted as a bonus', () => {
+      for (let i = 0; i < 9; i++) {
         game.roll(1);
-        expect(game.frameScores[0]).to.equal(11);
-        expect(game.frameScores[1]).to.equal(1);
-        expect(game.score).to.equal(12);
-
         game.roll(1);
-        expect(game.frameScores[0]).to.equal(12);
-        expect(game.frameScores[1]).to.equal(2);
-        expect(game.score).to.equal(14);
+      }
 
+      game.roll(0);
+      game.roll(10);
+
+      expect(game.hasEnded).to.be.false;
+      expect(game.score).to.equal(28);
+      expect(game.currentFrameIndex).to.equal(9);
+
+      game.roll(1);
+
+      expect(game.hasEnded).to.be.true;
+      expect(game.score).to.equal(29);
+      expect(game.currentFrameIndex).to.equal(9);
+    });
+
+    it('A strike results in 2 extra bonus rolls, which are only counted as a bonus', () => {
+      for (let i = 0; i < 9; i++) {
         game.roll(1);
-        expect(game.frameScores[0]).to.equal(12);
-        expect(game.frameScores[1]).to.equal(2);
-        expect(game.frameScores[2]).to.equal(1);
-        expect(game.score).to.equal(15);
-      });
-
-      it('Bonuses accumulate correctly after a double strike', () => {
-        game.roll(10);
-
-        game.roll(10);
-        expect(game.frameScores[0]).to.equal(20);
-        expect(game.frameScores[1]).to.equal(10);
-        expect(game.score).to.equal(30);
-
         game.roll(1);
-        expect(game.frameScores[0]).to.equal(21);
-        expect(game.frameScores[1]).to.equal(11);
-        expect(game.frameScores[2]).to.equal(1);
-        expect(game.score).to.equal(33);
+      }
 
-        game.roll(1);
-        expect(game.frameScores[0]).to.equal(21);
-        expect(game.frameScores[1]).to.equal(12);
-        expect(game.frameScores[2]).to.equal(2);
-        expect(game.score).to.equal(35);
-      });
+      game.roll(10);
 
-      it('Bonuses accumulate correctly after a triple strike', () => {
-        game.roll(10);
-        game.roll(10);
+      expect(game.hasEnded).to.be.false;
+      expect(game.score).to.equal(28);
+      expect(game.currentFrameIndex).to.equal(9);
 
-        game.roll(10);
-        expect(game.frameScores[0]).to.equal(30);
-        expect(game.frameScores[1]).to.equal(20);
-        expect(game.frameScores[2]).to.equal(10);
-        expect(game.score).to.equal(60);
+      game.roll(1);
+      game.roll(1);
 
-        game.roll(1);
-        expect(game.frameScores[0]).to.equal(30);
-        expect(game.frameScores[1]).to.equal(21);
-        expect(game.frameScores[2]).to.equal(11);
-        expect(game.frameScores[3]).to.equal(1);
-        expect(game.score).to.equal(63);
-
-        game.roll(1);
-        expect(game.frameScores[0]).to.equal(30);
-        expect(game.frameScores[1]).to.equal(21);
-        expect(game.frameScores[2]).to.equal(12);
-        expect(game.frameScores[3]).to.equal(2);
-        expect(game.score).to.equal(65);
-      });
+      expect(game.hasEnded).to.be.true;
+      expect(game.score).to.equal(30);
+      expect(game.currentFrameIndex).to.equal(9);
     });
   });
 });
