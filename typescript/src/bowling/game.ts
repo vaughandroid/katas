@@ -10,9 +10,9 @@ export class Game {
       return;
     }
 
-    this._frames.forEach(frame => frame.applyBonus(pinsKnockedDown));
+    this._frames.forEach(frame => frame.addBonusIfNeeded(pinsKnockedDown));
 
-    this.currentFrame.applyRoll(pinsKnockedDown);
+    this.currentFrame.roll(pinsKnockedDown);
     if (this.currentFrame.isCompleted) {
       this.advanceFrame();
     }
@@ -51,24 +51,19 @@ class Frame {
   pendingBonusRolls = 0;
   isCompleted = false;
 
-  applyRoll(pinsKnockedDown: number) {
+  roll(pinsKnockedDown: number) {
     this.score += pinsKnockedDown;
-
     this.rollsThisFrame++;
 
     if (this.score === 10) {
-      if (this.rollsThisFrame === 1) {
-        this.pendingBonusRolls = 2;
-      } else {
-        this.pendingBonusRolls = 1;
-      }
+      this.pendingBonusRolls = this.rollsThisFrame === 1 ? 2 : 1;
       this.isCompleted = true;
     } else if (this.rollsThisFrame === 2) {
       this.isCompleted = true;
     }
   }
 
-  applyBonus(pinsKnockedDown: number) {
+  addBonusIfNeeded(pinsKnockedDown: number) {
     if (this.pendingBonusRolls > 0) {
       this.score += pinsKnockedDown;
       this.pendingBonusRolls--;
