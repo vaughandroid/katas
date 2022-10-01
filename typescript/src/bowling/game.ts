@@ -15,11 +15,11 @@ export class Game {
     }
   }
 
-  score() {
+  get score() {
     return this.#score;
   }
 
-  frame() {
+  get frame() {
     return this.#frame;
   }
 
