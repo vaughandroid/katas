@@ -1,34 +1,66 @@
 export class Game {
-  #rollCount = 0;
-  #score = 0;
-  #frame = 0;
-  #rollsThisFrame = 0;
+  private _rollCount = 0;
+  private _currentFrame = 0;
+  private _frames = [
+    new Frame(), new Frame(), new Frame(), new Frame(), new Frame(),
+    new Frame(), new Frame(), new Frame(), new Frame(), new Frame()
+  ]
 
   roll(pinsKnockedDown: number) {
-    if (this.gameIsInProgress()) {
-      this.#score += pinsKnockedDown;
-      this.#rollCount++;
-      this.#rollsThisFrame++;
-      if (this.#rollsThisFrame === 2) {
-        this.advanceFrame();
+    if (this.gameIsEnded) {
+      return;
+    }
+
+    const currentFrame = this._frames[this._currentFrame];
+    currentFrame.score += pinsKnockedDown;
+
+    this._frames.forEach(frame => {
+      if (frame.bonusRolls > 0) {
+        frame.score += pinsKnockedDown;
+        frame.bonusRolls--;
       }
+    })
+
+    this._rollCount++;
+    currentFrame.rollsThisFrame++;
+
+    if (currentFrame.score === 10) {
+      if (currentFrame.rollsThisFrame === 1) {
+        currentFrame.bonusRolls = 2;
+      } else {
+        currentFrame.bonusRolls = 1;
+      }
+      this.advanceFrame();
+    } else if (currentFrame.rollsThisFrame === 2) {
+      this.advanceFrame();
     }
   }
 
   get score() {
-    return this.#score;
+    return this._frames.reduce((prev, curr) => prev + curr.score, 0);
   }
 
-  get frame() {
-    return this.#frame;
+  get currentFrame() {
+    return this._currentFrame;
   }
 
-  private gameIsInProgress() {
-    return this.#rollCount < 20;
+  get frameScores() {
+    return this._frames.map(frame => frame.score);
+  }
+
+  private get gameIsEnded() {
+    return this._rollCount === 20;
   }
 
   private advanceFrame() {
-    this.#frame++;
-    this.#rollsThisFrame = 0;
+    if (this._currentFrame < 9) {
+      this._currentFrame++;
+    }
   }
+}
+
+class Frame {
+  rollsThisFrame = 0;
+  score = 0;
+  bonusRolls = 0;
 }
