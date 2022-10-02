@@ -134,7 +134,6 @@ describe('Bowling', () => {
         expect(game.score).to.equal(13);
       });
 
-
       describe('Strikes', () => {
         it('After a strike, the next two rolls count towards the score for the frame as a bonus', () => {
           game.roll(10);

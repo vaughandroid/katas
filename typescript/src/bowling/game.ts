@@ -1,16 +1,24 @@
 export class Game {
   private _currentFrameIndex = 0;
   private _frames = [
-    new Frame(), new Frame(), new Frame(), new Frame(), new Frame(),
-    new Frame(), new Frame(), new Frame(), new Frame(), new FinalFrame()
-  ]
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new Frame(),
+    new FinalFrame()
+  ];
 
   roll(pinsKnockedDown: number) {
     if (this.hasEnded) {
       return;
     }
 
-    this._frames.forEach(frame => frame.addBonusIfNeeded(pinsKnockedDown));
+    this._frames.forEach((frame) => frame.addBonusIfNeeded(pinsKnockedDown));
 
     this.currentFrame.roll(pinsKnockedDown);
     if (this.currentFrame.isCompleted) {
@@ -27,7 +35,7 @@ export class Game {
   }
 
   get frameScores() {
-    return this._frames.map(frame => frame.score);
+    return this._frames.map((frame) => frame.score);
   }
 
   get hasEnded() {
