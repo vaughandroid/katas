@@ -21,6 +21,7 @@ However, no more than three balls can be rolled in the tenth frame.
 ### Requirements
 
 Write a class Game that has two methods:
+
 * `void roll(int)` is called each time the player rolls a ball. The argument is the number of pins knocked down.
 * `int score()` returns the total score for that game.
 
@@ -37,12 +38,18 @@ The second complex bit was the special case handling for the last frame. I ended
 for this, but I'm not entirely happy with the approach so would look to try a different approach if I tried this
 exercise again.
 
-Along the way, I ended up adding some extra public methods and properties which weren't described in the spec, but made 
-writing tests much easier. I think this was a valid thing to do, since they felt like things that would be useful to 
+Along the way, I ended up adding some extra public methods and properties which weren't described in the spec, but made
+writing tests much easier. I think this was a valid thing to do, since they felt like things that would be useful to
 clients rather than just internal details.
 
 All in all it's an interesting exercise to try, and I can see why it's a popular kata.
 
+## Dependency Injection
+
+Not really a kata, this is just a demo of a couple of options for doing Dependency Injection in TypeScript.
+
+* [greeter-class.ts](src/dependency-injection/greeter-class.ts) demonstrates class-based DI.
+* [greeter-function.ts](src/dependency-injection/greeter-function.ts) demonstrates function-based DI.
 
 ## Developing
 
